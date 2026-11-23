@@ -1,0 +1,767 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kartu Reputasi Penjual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500..900&family=Source+Sans+3:ital,wght@0,400..700;1,400&display=swap">
+<style>
+/* Layout concept: satu kartu reputasi sebagai pusat halaman. Beranda = pencarian + daftar kartu, detail = kartu penuh + bukti, dengan palet navy, oranye, dan kuning dari identitas tim. */
+:root{
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'Source Sans 3',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --bg:#F2F4F8;--surface:#FFFFFF;--surface-2:#E9EDF5;--ink:#14213D;--muted:#566176;--line:#D8DEE9;
+  --accent:#F25C05;--accent-ink:#B84304;--on-accent:#14213D;--sun:#FFC62B;
+  --head:#14213D;--head-ink:#FFFFFF;
+  --good:#13744A;--good-bg:#DDF3E7;--bad:#A8321F;--bad-bg:#FBE3DE;--star:#F2A900;--star-off:#CBD3E1;
+  --shadow:0 1px 2px rgba(20,33,61,.06),0 10px 28px rgba(20,33,61,.09);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1220;--surface:#142039;--surface-2:#1C2A48;--ink:#EDF1F8;--muted:#9EABC2;--line:#2A3A5C;
+    --accent:#FF7A2E;--accent-ink:#FF9455;--on-accent:#0B1220;--head:#080E1B;
+    --good:#52D69A;--good-bg:#12372B;--bad:#FF8F7D;--bad-bg:#43211C;--star:#FFC62B;--star-off:#3A4B70;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1220;--surface:#142039;--surface-2:#1C2A48;--ink:#EDF1F8;--muted:#9EABC2;--line:#2A3A5C;
+  --accent:#FF7A2E;--accent-ink:#FF9455;--on-accent:#0B1220;--head:#080E1B;
+  --good:#52D69A;--good-bg:#12372B;--bad:#FF8F7D;--bad-bg:#43211C;--star:#FFC62B;--star-off:#3A4B70;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--head);z-index:30}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1;letter-spacing:-.01em}
+h1{font-weight:800;font-size:clamp(2rem,5.2vw,3.4rem)}
+h2{font-weight:800;font-size:clamp(1.4rem,3vw,1.9rem)}
+h3{font-weight:700;font-size:1.1rem}
+p{margin:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:700 .78rem/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink)}
+.muted{color:var(--muted)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--head);color:var(--head-ink)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 1.05rem/1 var(--display);letter-spacing:-.005em}
+.mark{width:26px;height:26px;border-radius:50%;background:var(--accent);position:relative;flex:none}
+.mark::after{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:var(--sun);right:-3px;bottom:-3px}
+.top nav{display:flex;gap:6px}
+.top nav a{text-decoration:none;font-weight:600;font-size:.95rem;padding:8px 12px;border-radius:999px;color:rgba(255,255,255,.82)}
+.top nav a:hover{background:rgba(255,255,255,.1);color:#fff}
+.top nav a[aria-current="page"]{background:var(--sun);color:#14213D}
+
+/* buttons, chips, forms */
+.btn{font:700 .95rem/1 var(--body);display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:8px 12px;min-height:36px;font-size:.88rem}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 .8rem/1 var(--body);padding:6px 10px;border-radius:999px;background:var(--surface-2);color:var(--ink);white-space:nowrap}
+.chip.good{background:var(--good-bg);color:var(--good)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.pend{background:transparent;border:1.5px dashed var(--muted);color:var(--muted)}
+.chip.ok::before{content:"✓";font-weight:800}
+label{font-weight:600;font-size:.92rem}
+input[type=text],input[type=email],input[type=password],input[type=search],select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;min-height:44px}
+textarea{min-height:104px;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.hint{font-size:.88rem;color:var(--muted)}
+.err{color:var(--bad);font-weight:600;font-size:.92rem;min-height:1.2em}
+
+/* stars */
+.stars{position:relative;display:inline-block;font-size:1.2rem;line-height:1;color:var(--star-off);white-space:nowrap;vertical-align:middle}
+.stars::before{content:"★★★★★"}
+.stars i{position:absolute;left:0;top:0;height:100%;overflow:hidden;color:var(--star)}
+.stars i::before{content:"★★★★★"}
+
+/* hero */
+.hero{overflow:hidden;background:var(--head);color:var(--head-ink)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center;padding-block:48px 56px}
+.hero .eyebrow{color:var(--sun)}
+.hero h1{margin-block:14px 16px}
+.hero .lead{font-size:1.12rem;color:rgba(255,255,255,.82);max-width:34rem}
+.search{display:flex;gap:10px;margin-top:26px;max-width:36rem}
+.search input{flex:1;background:#fff;color:#14213D;border-color:#fff}
+.search input::placeholder{color:#5a6577}
+.hero-art{position:relative;isolation:isolate;padding:28px 8px}
+.hero-art::before{content:"";position:absolute;width:118%;aspect-ratio:1;border-radius:50%;background:var(--accent);right:-34%;top:-16%;z-index:-2}
+.hero-art::after{content:"";position:absolute;width:76px;height:76px;border-radius:50%;background:var(--sun);left:-4px;bottom:-6px;z-index:-1}
+.hero-note{font-size:.8rem;color:rgba(255,255,255,.7);margin-top:10px}
+
+/* kartu */
+.kartu{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+.k-head{display:flex;gap:14px;align-items:center}
+.avatar{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font:800 1.15rem/1 var(--display);flex:none;background:var(--accent);color:#14213D}
+.avatar.v1{background:var(--head);color:#fff}
+.avatar.v2{background:var(--sun);color:#14213D}
+.avatar.sm{width:44px;height:44px;font-size:.95rem}
+.k-handle{font:800 1.15rem/1.2 var(--display);overflow-wrap:anywhere}
+.k-sub{font-size:.88rem;color:var(--muted)}
+.k-rate{display:flex;align-items:center;gap:12px;margin-block:18px 14px}
+.k-rate b{font:800 1.05rem var(--display)}
+.stat{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:baseline;padding-block:7px}
+.stat b{font:800 1.7rem/1 var(--display);color:var(--accent-ink)}
+.stat span{color:var(--ink)}
+.k-label{font:700 .76rem/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-block:16px 10px}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.thumbs .ph-img{border-radius:10px}
+.k-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+
+/* sections */
+.band{padding-block:44px}
+.band.alt{background:var(--surface-2)}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.sec-head p{max-width:40rem;color:var(--muted);margin-top:8px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.pill{font:600 .9rem/1 var(--body);padding:10px 14px;min-height:40px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--head);border-color:var(--head);color:#fff}
+:root[data-theme="dark"] .pill[aria-pressed="true"]{background:var(--sun);border-color:var(--sun);color:#14213D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill[aria-pressed="true"]{background:var(--sun);border-color:var(--sun);color:#14213D}}
+.check{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.92rem}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.filters .sel{margin-left:auto;display:flex;align-items:center;gap:8px}
+.filters select{width:auto;min-height:40px;padding-block:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:18px}
+.sc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.sc-top{display:flex;gap:12px;align-items:center}
+.sc-top a{font:800 1.05rem/1.2 var(--display);text-decoration:none;overflow-wrap:anywhere}
+.sc-top a:hover{text-decoration:underline}
+.sc-meta{display:flex;gap:6px;flex-wrap:wrap}
+.sc-rate{display:flex;align-items:center;gap:10px}
+.sc-rate b{font:800 1rem var(--display)}
+.sc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.sc-stats div{display:flex;flex-direction:column;gap:2px}
+.sc-stats b{font:800 1.3rem/1 var(--display);color:var(--accent-ink)}
+.sc-stats span{font-size:.78rem;color:var(--muted);line-height:1.25}
+.sc-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:auto}
+.empty{padding:28px;border:1.5px dashed var(--line);border-radius:16px;color:var(--muted);text-align:center}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;list-style:none;margin:0;padding:0}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;border-top:5px solid var(--c)}
+.steps li:nth-child(1){--c:#2BB6B3}.steps li:nth-child(2){--c:#2F6AB5}.steps li:nth-child(3){--c:#F5BE3B}.steps li:nth-child(4){--c:#F27B63}.steps li:nth-child(5){--c:#3F9A6C}
+.steps b{font:700 1rem var(--display)}
+.steps span{font-size:.9rem;color:var(--muted)}
+
+/* detail */
+.crumb{display:inline-flex;gap:6px;align-items:center;text-decoration:none;font-weight:600;color:var(--muted);margin-block:24px 18px}
+.crumb:hover{color:var(--ink)}
+.detail{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start;padding-bottom:56px}
+.detail aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px)}
+.stack{display:flex;flex-direction:column;gap:22px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}
+.panel>h2{font-size:1.3rem;margin-bottom:6px}
+.panel>.hint{margin-bottom:16px}
+.cl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.cl li{display:grid;grid-template-columns:28px 1fr;gap:12px;padding-block:10px;border-top:1px solid var(--line)}
+.cl li:first-child{border-top:0}
+.cl .ic{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 .8rem/1 var(--body);background:var(--surface-2);color:var(--muted);margin-top:1px}
+.cl li.ok .ic{background:var(--good-bg);color:var(--good)}
+.cl b{display:block;font-weight:700}
+.cl span.d{font-size:.9rem;color:var(--muted)}
+.tx{list-style:none;margin:0;padding:0}
+.tx li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding-block:12px;border-top:1px solid var(--line);align-items:center}
+.tx li:first-child{border-top:0}
+.tx .it{font-weight:600;overflow-wrap:anywhere}
+.tx .dt{font-size:.85rem;color:var(--muted)}
+.tx .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.ph{margin:0}
+.ph-img{aspect-ratio:3/2;border-radius:12px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line)}
+.ph-img svg,.ph-img img{display:block;width:100%;height:100%;object-fit:cover}
+.ph figcaption{font-size:.8rem;color:var(--muted);margin-top:6px;line-height:1.3}
+.tabs{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.tab{font:700 .92rem/1 var(--body);padding:10px 14px;min-height:42px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--head);border-color:var(--head);color:#fff}
+:root[data-theme="dark"] .tab[aria-selected="true"]{background:var(--sun);border-color:var(--sun);color:#14213D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab[aria-selected="true"]{background:var(--sun);border-color:var(--sun);color:#14213D}}
+.rv{display:flex;flex-direction:column;gap:8px;padding-block:16px;border-top:1px solid var(--line)}
+.rv:first-of-type{border-top:0}
+.rv-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.rv-top b{font-weight:700}
+.rv-act{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.linkbtn{background:none;border:0;padding:6px 0;font:600 .86rem var(--body);color:var(--muted);cursor:pointer;text-decoration:underline;min-height:32px}
+.linkbtn:hover{color:var(--ink)}
+.rep{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rep select{width:auto;min-height:38px;padding-block:6px}
+.rv .ph{max-width:210px}
+
+/* form */
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+.form-grid .full{grid-column:1/-1}
+.rate-in{display:flex;gap:4px}
+.rs{font-size:1.9rem;line-height:1;background:none;border:0;cursor:pointer;color:var(--star-off);padding:4px 5px;min-width:44px;min-height:44px}
+.rs[aria-checked="true"],.rs.on{color:var(--star)}
+.previews{display:flex;gap:10px;flex-wrap:wrap}
+.previews .pv{position:relative;width:96px}
+.previews .pv .ph-img{aspect-ratio:1}
+.previews .pv button{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:.9rem;line-height:1}
+.consent{display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:.92rem}
+.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex:none}
+
+/* compare */
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+table.cmp{border-collapse:collapse;width:100%;min-width:560px}
+.cmp th,.cmp td{padding:14px 16px;text-align:left;border-top:1px solid var(--line);vertical-align:top}
+.cmp thead th{border-top:0;background:var(--surface-2)}
+.cmp tbody th{font-weight:600;color:var(--muted);width:30%}
+.cmp td b{font:800 1.15rem var(--display)}
+
+/* info */
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.cols .panel h3{margin-bottom:8px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.list{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:8px}
+.callout{border:1.5px solid var(--accent);border-radius:16px;padding:16px 18px;background:var(--surface)}
+.callout b{color:var(--accent-ink)}
+
+/* akun */
+.top .auth{display:flex;align-items:center;gap:8px}
+.top .auth .btn{min-height:38px;padding:8px 14px;font-size:.9rem;border-radius:999px}
+.top .auth .btn.ghost{background:transparent;border-color:rgba(255,255,255,.35);color:#fff}
+.top .auth .btn.ghost:hover{border-color:#fff}
+.me{display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:4px 12px 4px 4px;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-weight:700;font-size:.9rem;min-height:38px}
+.me:hover{background:rgba(255,255,255,.18)}
+.me .avatar{width:30px;height:30px;font-size:.72rem}
+.me .nm{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me .rl{font-size:.72rem;padding:3px 8px;border-radius:999px;background:var(--sun);color:#14213D}
+.auth-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;align-items:start;padding-block:36px 56px}
+.auth-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--shadow)}
+.auth-card h1{font-size:clamp(1.6rem,3.6vw,2.2rem);margin-block:10px 8px}
+.auth-card form{display:flex;flex-direction:column;gap:14px;margin-top:20px}
+.auth-side{position:relative;isolation:isolate;overflow:hidden;background:var(--head);color:var(--head-ink);border-radius:22px;padding:28px 28px 96px}
+.auth-side::before{content:"";position:absolute;width:200px;aspect-ratio:1;border-radius:50%;background:var(--accent);right:-60px;bottom:-60px;z-index:-1}
+.auth-side::after{content:"";position:absolute;width:56px;height:56px;border-radius:50%;background:var(--sun);right:96px;bottom:-18px;z-index:-1}
+.auth-side .eyebrow{color:var(--sun)}
+.auth-side h2{margin-block:10px 14px}
+.roles-set{border:0;padding:0;margin:0;min-width:0}
+.roles-set legend{padding:0;margin-bottom:8px;font-weight:600;font-size:.92rem}
+.roles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rolecard{position:relative;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer}
+.rolecard input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.rolecard.on{border-color:var(--accent);box-shadow:0 0 0 3px rgba(242,92,5,.18)}
+.rolecard:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.gate{display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:18px;border:1.5px dashed var(--line);border-radius:16px}
+.gate-act{display:flex;gap:10px;flex-wrap:wrap}
+.hero-cta{margin-top:14px;color:rgba(255,255,255,.82)}
+.hero-cta a{color:var(--sun);font-weight:700}
+.dl{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px 14px;margin:0}
+.dl dt{color:var(--muted)}.dl dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+@media (max-width:900px){.auth-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:720px){.top nav{order:3;width:100%}}
+@media (max-width:560px){.roles{grid-template-columns:minmax(0,1fr)}}
+
+/* bar, toast, footer */
+.cbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--head);color:#fff;padding-top:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.cbar .btn.sm{border-color:rgba(255,255,255,.35);background:transparent;color:#fff}
+.cbar .btn.primary{background:var(--accent);border-color:var(--accent);color:#14213D}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;z-index:40;max-width:calc(100% - 32px);box-shadow:var(--shadow)}
+footer{background:var(--head);color:rgba(255,255,255,.78);padding-block:32px 40px;margin-top:0}
+footer .wrap{display:flex;flex-direction:column;gap:10px;font-size:.9rem}
+footer b{color:#fff}
+.pad-bar{height:72px}
+
+@media (max-width:980px){
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cols{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:900px){
+  .hero .wrap{grid-template-columns:minmax(0,1fr);padding-block:36px 44px;gap:28px}
+  .detail{grid-template-columns:minmax(0,1fr)}
+  .detail aside{position:static}
+  .two{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .form-grid{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .filters .sel{margin-left:0;width:100%}
+  .filters select{flex:1}
+  .search{flex-direction:column}
+  .tx li{grid-template-columns:minmax(0,1fr)}
+  .tx .chips{justify-content:flex-start}
+  .top nav a{padding:8px 10px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#cari"><span class="mark" aria-hidden="true"></span>Kartu Reputasi Penjual</a>
+    <nav aria-label="Navigasi utama">
+      <a href="#cari" data-nav="cari">Cari penjual</a>
+      <a href="#bandingkan" data-nav="bandingkan">Bandingkan</a>
+      <a href="#cara-kerja" data-nav="cara-kerja">Cara kerja</a>
+    </nav>
+    <div class="auth" id="auth"></div>
+  </div>
+</header>
+
+<main id="view"></main>
+
+<footer>
+  <div class="wrap">
+    <p><b>Kartu Reputasi Penjual</b> · Studio Hot Wheels · MVP untuk komunitas kolektor Hot Wheels</p>
+    <p>Prototipe ini memakai data contoh. Akun yang Anda daftarkan hanya tersimpan di peramban ini, bukan di server. Ulasan yang Anda kirim hilang saat halaman dimuat ulang.</p>
+    <p>Tim: Jacky Adrian, Maheswari M., Mahen Pratama A., Sultan Vionanza Fais R., Grycelda Sthefanny Bintang T.</p>
+  </div>
+</footer>
+
+<div class="cbar" id="cbar" hidden>
+  <span id="cbar-n" role="status"></span>
+  <a class="btn primary sm" id="cbar-go" href="#bandingkan">Bandingkan</a>
+  <button class="btn sm" type="button" id="cbar-clear">Kosongkan</button>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var PAL=[['#E8452C','#FFC62B'],['#2E86DE','#EAF2FF'],['#16A085','#FFD166'],['#8E44AD','#FFC62B'],['#F39C12','#14213D']];
+function T(item,date,type,status,proof){return {item:item,date:date,type:type,status:status,proof:proof};}
+function R(from,who,rating,date,text,photo){return {from:from,who:who,rating:rating,date:date,text:text,photo:photo==null?null:{pal:photo}};}
+
+var sellers=[
+ {id:'penjual_contoh',handle:'@penjual_contoh',platform:'Facebook',group:'Grup Facebook kolektor Surabaya',city:'Surabaya',since:2021,rs:4.6,rb:4.8,done:48,cancel:2,verified:true,proofPct:90,reviewCount:31,
+  tx:[T("Skyline GT-R R34 (Treasure Hunt)",'2026-10-28','COD','selesai',true),T("'71 Datsun 510 (set 2 pcs)",'2026-10-11','Lelang','selesai',true),T("Custom '67 Camaro",'2026-09-30','COD','batal',false),T("Nissan Silvia S15",'2026-09-14','COD','selesai',true),T("Honda Civic EF (Super Treasure Hunt)",'2026-08-22','Lelang','selesai',false),T("Mazda RX-7 FD",'2026-08-03','COD','selesai',true),T("Toyota AE86 (zamac)",'2026-07-19','COD','batal',false),T("Porsche 911 GT3 RS",'2026-07-02','Lelang','selesai',true)],
+  reviews:[R('pembeli','@arif_h',5,'2026-10-28','Serah terima COD tepat waktu, barang sesuai foto dan blister masih rapi.',0),R('pembeli','@dina.diecast',5,'2026-10-11','Lelang berjalan lancar, resi dikirim di hari yang sama. Dikemas dengan bubble wrap dan protektor.',1),R('penjual','@bima_w',4,'2026-09-14','Pembeli cepat membalas dan membayar, sempat telat satu jam di lokasi COD.',null),R('pembeli','@yoga_hw',4,'2026-09-14','Barang sesuai deskripsi. Pengiriman agak lambat, terlambat dua hari dari janji.',2),R('penjual','@kolektor_malang',5,'2025-12-14','Pembeli rapi dan pembayaran sesuai kesepakatan.',null),R('penjual','@diecast.sby',5,'2026-05-02','Transaksi cepat dan jelas, foto bukti serah terima lengkap.',null)]},
+ {id:'diecast.sby',handle:'@diecast.sby',platform:'Instagram',group:'Instagram, DM dan story lelang',city:'Surabaya',since:2019,rs:4.9,rb:4.7,done:132,cancel:1,verified:true,proofPct:93,reviewCount:74,
+  tx:[T("Mini GT-R Nismo (Treasure Hunt)",'2026-11-02','Lelang','selesai',true),T("'69 Dodge Charger Daytona",'2026-10-19','COD','selesai',true),T("Nissan Fairlady Z432",'2026-10-05','COD','selesai',true),T("Honda S2000",'2026-09-21','Lelang','batal',false),T("Lamborghini Countach LP 5000 QV",'2026-09-08','COD','selesai',true)],
+  reviews:[R('pembeli','@raka.hw',5,'2026-11-02','Foto serah terima lengkap dan barang persis seperti deskripsi lelang.',3),R('pembeli','@sinta_c',5,'2026-10-19','COD di tempat ramai, penjual datang lebih awal.',4),R('penjual','@penjual_contoh',5,'2026-09-30','Pembeli sopan dan langsung membayar setelah menang lelang.',null)]},
+ {id:'gudang_hw',handle:'@gudang_hw',platform:'WhatsApp',group:'Grup WhatsApp jual beli kolektor Jawa Timur',city:'Sidoarjo',since:2023,rs:4.2,rb:4.5,done:17,cancel:4,verified:false,proofPct:41,reviewCount:9,
+  tx:[T("Toyota Supra A80",'2026-10-24','COD','selesai',false),T("Subaru Impreza 22B",'2026-10-09','COD','batal',false),T("'95 Mazda RX-7",'2026-09-27','Lelang','selesai',true),T("Ford Mustang Fox Body",'2026-09-10','Lelang','batal',false)],
+  reviews:[R('pembeli','@tegar_hw',4,'2026-10-24','Barang sesuai, tetapi balasan chat sering lambat.',null),R('pembeli','@mira.k',3,'2026-10-09','Sepakat COD lalu dibatalkan di hari yang sama tanpa penjelasan.',null)]},
+ {id:'lapak_tomat',handle:'@lapak_tomat',platform:'TikTok',group:'TikTok live dan komentar',city:'Gresik',since:2024,rs:4.8,rb:null,done:6,cancel:0,verified:false,proofPct:67,reviewCount:4,
+  tx:[T("Datsun Bluebird 510 Wagon",'2026-10-30','COD','selesai',true),T("VW Kafer Racer",'2026-10-12','COD','selesai',true),T("Toyota Celica GT-Four",'2026-09-25','Lelang','selesai',false)],
+  reviews:[R('pembeli','@hasan_d',5,'2026-10-30','Penjual ramah, barang sesuai live. Foto serah terima saya lampirkan.',2),R('pembeli','@nadia.r',5,'2026-10-12','Cepat dan jelas, tidak banyak tanya.',null)]},
+ {id:'kolektor_malang',handle:'@kolektor_malang',platform:'Facebook',group:'Grup Facebook kolektor Malang Raya',city:'Malang',since:2018,rs:4.7,rb:4.9,done:85,cancel:3,verified:true,proofPct:88,reviewCount:52,
+  tx:[T("Nissan Skyline HT 2000GT-X",'2026-11-05','COD','selesai',true),T("Honda NSX",'2026-10-22','Lelang','selesai',true),T("Porsche 934 Turbo RSR",'2026-10-01','COD','batal',false),T("Mercedes-Benz 190E 2.5-16",'2026-09-15','COD','selesai',true)],
+  reviews:[R('pembeli','@fajar_m',5,'2026-11-05','Packing aman, ada protektor kartu. Sangat disarankan.',1),R('pembeli','@lia.diecast',4,'2026-10-22','Barang sesuai, hanya pengiriman satu hari lebih lama.',null),R('penjual','@diecast.sby',5,'2026-08-18','Pembeli tepat janji dan komunikatif.',null)]},
+ {id:'baru_gabung',handle:'@baru_gabung',platform:'Instagram',group:'Instagram, DM',city:'Surabaya',since:2026,rs:null,rb:null,done:0,cancel:0,verified:false,proofPct:null,reviewCount:0,tx:[],reviews:[]}
+];
+var extra={};
+sellers.forEach(function(s){extra[s.id]={reviews:[],tx:[]};});
+var st={q:'',plat:'Semua',ver:false,sort:'tx',tab:'penjual',cmp:[],form:{rating:0,photos:[]},next:'',regRole:'pembeli'};
+
+/* ---------- akun (prototipe: hanya tersimpan di peramban ini) ---------- */
+function store(w){return {get:function(k){try{return window[w].getItem(k);}catch(x){return null;}},set:function(k,v){try{window[w].setItem(k,v);}catch(x){}},del:function(k){try{window[w].removeItem(k);}catch(x){}}};}
+var LS=store('localStorage'),SS=store('sessionStorage'),accounts=[],busy=false;
+try{accounts=JSON.parse(LS.get('krp_accounts')||'[]');}catch(x){accounts=[];}
+if(!Array.isArray(accounts))accounts=[];
+accounts=accounts.filter(function(a){return a&&typeof a.email==='string'&&typeof a.salt==='string'&&typeof a.hash==='string'&&/^@[a-z0-9._]{3,24}$/.test(a.handle||'')&&(a.role==='pembeli'||a.role==='penjual');});
+function persist(){LS.set('krp_accounts',JSON.stringify(accounts));}
+function sellerFromAccount(a){return {id:a.id,handle:a.handle,platform:a.platform||'Instagram',group:a.group||('Profil '+(a.platform||'Instagram')),city:a.city||'-',since:a.since||2026,rs:null,rb:null,done:0,cancel:0,verified:false,proofPct:null,reviewCount:0,tx:[],reviews:[]};}
+accounts.forEach(function(a){if(a.role!=='penjual')return;a.id=a.handle.slice(1);if(byId(a.id))return;sellers.push(sellerFromAccount(a));extra[a.id]={reviews:[],tx:[]};});
+var sessEmail=SS.get('krp_session')||LS.get('krp_session')||null;
+function me(){if(!sessEmail)return null;for(var i=0;i<accounts.length;i++){if(accounts[i].email===sessEmail)return accounts[i];}return null;}
+function b64(buf){var a=new Uint8Array(buf),s='';for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s);}
+function rand(n){var a=new Uint8Array(n);if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(var i=0;i<n;i++)a[i]=Math.floor(Math.random()*256);return b64(a);}
+function hashPw(pw,salt){
+  if(window.crypto&&crypto.subtle){var e=new TextEncoder();
+    return crypto.subtle.importKey('raw',e.encode(pw),'PBKDF2',false,['deriveBits']).then(function(k){return crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode(salt),iterations:100000,hash:'SHA-256'},k,256);}).then(b64);}
+  var h=5381,s=salt+pw;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Promise.resolve('x'+h);
+}
+function setSession(a,rem){sessEmail=a.email;SS.del('krp_session');LS.del('krp_session');(rem?LS:SS).set('krp_session',a.email);}
+function logout(){sessEmail=null;SS.del('krp_session');LS.del('krp_session');toast('Anda sudah keluar.');if(location.hash==='#akun')location.hash='#cari';else route();}
+function handleTaken(h){return sellers.some(function(s){return s.handle===h;})||accounts.some(function(a){return a.handle===h;});}
+
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function num(n,d){if(n==null)return '–';d=d==null?1:d;return n.toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function fmtDate(d){return new Intl.DateTimeFormat('id-ID',{day:'numeric',month:'short',year:'numeric'}).format(new Date(d));}
+function cancelPct(s){var t=s.done+s.cancel;return t?Math.round(s.cancel/t*1000)/10:null;}
+function fmtPct(p){return p==null?'–':p.toLocaleString('id-ID',{maximumFractionDigits:1})+'%';}
+function byId(id){for(var i=0;i<sellers.length;i++){if(sellers[i].id===id)return sellers[i];}return null;}
+function initials(h){return h.replace('@','').replace(/[^a-zA-Z0-9]/g,'').slice(0,2).toUpperCase();}
+function avClass(s){var i=sellers.indexOf(s)%3;return i===0?'':(i===1?'v1':'v2');}
+function stars(r){return '<span class="stars" role="img" aria-label="'+(r==null?'Belum ada rating':num(r)+' dari 5')+'"><i style="width:'+(r==null?0:r/5*100)+'%"></i></span>';}
+function car(p){var a=p[0],b=p[1];return '<svg viewBox="0 0 120 80" aria-hidden="true" focusable="false"><rect width="120" height="80" fill="'+a+'" opacity=".16"/><rect y="62" width="120" height="18" fill="'+a+'" opacity=".28"/><path d="M12 56V47q0-5 6-6l17-3 10-13q2-3 6-3h25q4 0 7 3l10 13 11 3q6 1 6 6v9z" fill="'+a+'"/><path d="M47 38l8-10h22l8 10z" fill="#EAF2FF" opacity=".92"/><rect x="12" y="49" width="96" height="3" fill="'+b+'"/><circle cx="35" cy="57" r="9" fill="#12151C"/><circle cx="35" cy="57" r="4" fill="#C9D1DE"/><circle cx="87" cy="57" r="9" fill="#12151C"/><circle cx="87" cy="57" r="4" fill="#C9D1DE"/></svg>';}
+function photoImg(ph){if(ph.src)return '<img src="'+ph.src+'" alt="Foto yang diunggah pengulas">';return car(PAL[ph.pal%PAL.length]);}
+function allReviews(s){return extra[s.id].reviews.concat(s.reviews);}
+function allTx(s){return extra[s.id].tx.concat(s.tx);}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true;},3200);}
+
+/* ---------- komponen ---------- */
+function kartu(s,opts){
+  opts=opts||{};
+  var th=allReviews(s).filter(function(r){return r.photo;}).slice(0,3);
+  var h='<div class="kartu"><div class="k-head"><div class="avatar '+avClass(s)+'" aria-hidden="true">'+initials(s.handle)+'</div><div><div class="k-handle">'+esc(s.handle)+'</div><div class="k-sub">Anggota sejak '+s.since+' · '+esc(s.platform)+'</div></div></div>';
+  h+='<div class="k-rate">'+stars(s.rs)+'<b class="tnum">'+(s.rs==null?'Belum ada rating':num(s.rs)+' / 5')+'</b></div>';
+  h+='<div class="stat"><b class="tnum">'+s.done+'</b><span>transaksi selesai</span></div>';
+  h+='<div class="stat"><b class="tnum">'+s.cancel+'</b><span>batal sepihak</span></div>';
+  h+='<div class="stat"><b class="tnum">'+num(s.rb)+'</b><span>rating sebagai pembeli</span></div>';
+  h+='<div class="k-label">Testimoni foto</div>';
+  if(th.length){h+='<div class="thumbs">'+th.map(function(r){return '<div class="ph-img">'+photoImg(r.photo)+'</div>';}).join('')+'</div>';}
+  else{h+='<p class="hint">Belum ada testimoni foto.</p>';}
+  if(opts.actions){h+='<div class="k-foot">'+opts.actions+'</div>';}
+  return h+'</div>';
+}
+function sellerCard(s){
+  var p=cancelPct(s),on=st.cmp.indexOf(s.id)>-1;
+  return '<article class="sc"><div class="sc-top"><div class="avatar sm '+avClass(s)+'" aria-hidden="true">'+initials(s.handle)+'</div><div style="min-width:0"><a href="#penjual-'+esc(s.id)+'">'+esc(s.handle)+'</a><div class="k-sub">Sejak '+s.since+' · '+esc(s.city)+'</div></div></div>'
+  +'<div class="sc-meta"><span class="chip">'+esc(s.platform)+'</span>'+(s.verified?'<span class="chip good ok">Akun terverifikasi</span>':'<span class="chip">Akun belum diverifikasi</span>')+'</div>'
+  +'<div class="sc-rate">'+stars(s.rs)+'<b class="tnum">'+(s.rs==null?'Belum ada rating':num(s.rs))+'</b></div>'
+  +'<div class="sc-stats"><div><b class="tnum">'+s.done+'</b><span>transaksi selesai</span></div><div><b class="tnum">'+s.cancel+'</b><span>batal sepihak'+(p==null?'':' ('+fmtPct(p)+')')+'</span></div><div><b class="tnum">'+num(s.rb)+'</b><span>rating sebagai pembeli</span></div></div>'
+  +'<div class="sc-foot"><a class="btn sm" href="#penjual-'+esc(s.id)+'">Lihat kartu</a><label class="check"><input type="checkbox" data-cmp="'+esc(s.id)+'"'+(on?' checked':'')+'> Bandingkan</label></div></article>';
+}
+function stepsHtml(){
+  var S=[['Cari penjual','Pembeli membuka tautan atau mencari profil penjual.'],['Periksa profil','Melihat rating, riwayat transaksi, dan testimoni foto.'],['Cek bukti transaksi','Memeriksa label transaksi terverifikasi dan konteks ulasan.'],['Putuskan','Menggunakan informasi sebagai salah satu pertimbangan sebelum transaksi.'],['Beri ulasan','Setelah transaksi selesai, pengguna memberi rating dan foto sesuai pengalaman.']];
+  return '<ol class="steps">'+S.map(function(x,i){return '<li><span class="eyebrow">Langkah '+(i+1)+'</span><b>'+x[0]+'</b><span>'+x[1]+'</span></li>';}).join('')+'</ol>';
+}
+
+/* ---------- beranda ---------- */
+function home(){
+  var s0=byId('penjual_contoh');
+  var plats=['Semua','Facebook','WhatsApp','Instagram','TikTok'];
+  document.getElementById('view').innerHTML=
+  '<section class="hero"><div class="wrap"><div><span class="eyebrow">Untuk komunitas kolektor Hot Wheels</span><h1>Lihat rekam jejak penjual sebelum sepakat.</h1><p class="lead">Riwayat transaksi, rating dua arah, dan testimoni foto dalam satu kartu. Cukup untuk memutuskan lanjut atau tidak, sebelum COD atau lelang disepakati.</p>'
+  +'<form class="search" id="sform" role="search"><label for="q" class="sr" style="position:absolute;left:-9999px">Cari penjual</label><input type="search" id="q" placeholder="Cari nama akun, platform, atau kota" value="'+esc(st.q)+'" autocomplete="off"><button class="btn primary" type="submit">Cari</button></form>'+(me()?'':'<p class="hero-cta">Belum punya akun? <a href="#daftar" data-next>Daftar sebagai pembeli atau penjual</a> atau <a href="#masuk" data-next>masuk</a>.</p>')+'</div>'
+  +'<div class="hero-art">'+kartu(s0,{actions:'<a class="btn primary sm" href="#penjual-penjual_contoh">Buka kartu ini</a>'})+'<p class="hero-note">Ilustrasi konsep, bukan data nyata.</p></div></div></section>'
+  +'<section class="band" id="daftar"><div class="wrap"><div class="sec-head"><div><h2>Penjual di komunitas</h2><p id="count" class="muted" role="status"></p></div></div>'
+  +'<div class="filters" role="group" aria-label="Filter penjual">'+plats.map(function(p){return '<button type="button" class="pill" data-plat="'+p+'" aria-pressed="'+(st.plat===p)+'">'+p+'</button>';}).join('')
+  +'<label class="check"><input type="checkbox" id="ver"'+(st.ver?' checked':'')+'> Hanya akun terverifikasi</label>'
+  +'<div class="sel"><label for="sort">Urutkan</label><select id="sort"><option value="tx"'+(st.sort==='tx'?' selected':'')+'>Transaksi terbanyak</option><option value="rating"'+(st.sort==='rating'?' selected':'')+'>Rating tertinggi</option><option value="batal"'+(st.sort==='batal'?' selected':'')+'>Batal sepihak paling jarang</option></select></div></div>'
+  +'<div class="grid" id="list"></div></div></section>'
+  +'<section class="band alt"><div class="wrap"><div class="sec-head"><div><h2>Cara memakai kartu</h2><p>Lima langkah dari mencari penjual sampai memberi ulasan.</p></div><a class="btn" href="#cara-kerja">Selengkapnya</a></div>'+stepsHtml()+'</div></section><div class="pad-bar"></div>';
+  renderList();
+}
+function filtered(){
+  var q=st.q.trim().toLowerCase();
+  var a=sellers.filter(function(s){
+    return (!q||[s.handle,s.platform,s.city,s.group].join(' ').toLowerCase().indexOf(q)>-1)&&(st.plat==='Semua'||s.platform===st.plat)&&(!st.ver||s.verified);
+  });
+  var pc=function(s){var p=cancelPct(s);return p==null?Infinity:p;};
+  if(st.sort==='tx')a.sort(function(x,y){return y.done-x.done;});
+  else if(st.sort==='rating')a.sort(function(x,y){return (y.rs==null?-1:y.rs)-(x.rs==null?-1:x.rs);});
+  else a.sort(function(x,y){return pc(x)-pc(y);});
+  return a;
+}
+function renderList(){
+  var a=filtered(),l=document.getElementById('list'),c=document.getElementById('count');
+  if(!l)return;
+  c.textContent=a.length+' dari '+sellers.length+' penjual contoh ditampilkan. Data contoh untuk prototipe.';
+  l.innerHTML=a.length?a.map(sellerCard).join(''):'<div class="empty" style="grid-column:1/-1">Tidak ada penjual yang cocok. Coba kata kunci lain atau lepas filter.</div>';
+}
+
+/* ---------- detail ---------- */
+function checklist(s){
+  var p=cancelPct(s),age=2026-s.since;
+  var items=[
+    {ok:s.done>=10,t:'Riwayat transaksi cukup',d:s.done?s.done+' transaksi selesai tercatat.':'Belum ada transaksi tercatat.'},
+    {ok:p!=null&&p<=5,t:'Jarang batal sepihak',d:p==null?'Belum ada kesepakatan yang tercatat.':s.cancel+' dari '+(s.done+s.cancel)+' kesepakatan dibatalkan sepihak ('+fmtPct(p)+').'},
+    {ok:s.proofPct!=null&&s.proofPct>=50,t:'Ada bukti foto transaksi',d:s.proofPct==null?'Belum ada foto serah terima.':fmtPct(s.proofPct)+' transaksi selesai punya foto barang atau serah terima.'},
+    {ok:s.rb!=null&&s.rs!=null,t:'Dinilai dua arah',d:s.rb!=null&&s.rs!=null?'Sudah dinilai sebagai penjual dan sebagai pembeli.':'Belum dinilai di kedua peran.'},
+    {ok:s.verified,t:'Akun terverifikasi',d:s.verified?'Tautan akun cocok dengan profil di '+s.platform+'.':'Tautan akun belum dicocokkan oleh moderator.'},
+    {ok:age>=1,t:'Aktif lebih dari satu tahun',d:'Anggota sejak '+s.since+'.'}
+  ];
+  return '<ul class="cl">'+items.map(function(i){return '<li class="'+(i.ok?'ok':'')+'"><span class="ic" aria-hidden="true">'+(i.ok?'✓':'–')+'</span><div><b>'+i.t+'</b><span class="d">'+i.d+'</span></div></li>';}).join('')+'</ul>';
+}
+function txHtml(s){
+  var t=allTx(s);
+  if(!t.length)return '<div class="empty">Belum ada transaksi tercatat. Ulasan pertama akan muncul di sini setelah transaksi selesai.</div>';
+  return '<ul class="tx">'+t.map(function(x){
+    var chips='<span class="chip">'+x.type+'</span>';
+    chips+=x.pending?'<span class="chip pend">Menunggu verifikasi</span>':(x.status==='selesai'?'<span class="chip good">Selesai</span>':'<span class="chip bad">Batal sepihak</span>');
+    if(x.proof&&!x.pending)chips+='<span class="chip good ok">Terverifikasi</span>';
+    return '<li><div><div class="it">'+esc(x.item)+'</div><div class="dt">'+fmtDate(x.date)+'</div></div><div class="chips">'+chips+'</div></li>';
+  }).join('')+'</ul>';
+}
+function reviewsHtml(s){
+  var role=st.tab;
+  var list=allReviews(s).filter(function(r){return role==='penjual'?r.from==='pembeli':r.from==='penjual';});
+  if(!list.length)return '<div class="empty">Belum ada ulasan di peran ini.</div>';
+  return list.map(function(r,i){
+    return '<div class="rv"><div class="rv-top">'+stars(r.rating)+'<b class="tnum">'+num(r.rating,0)+'/5</b><span class="muted">dari '+esc(r.who)+(r.from==='pembeli'?' (pembeli)':' (penjual)')+' · '+fmtDate(r.date)+'</span>'+(r.pending?'<span class="chip pend">Menunggu verifikasi</span>':'')+'</div>'
+    +'<p>'+esc(r.text)+'</p>'+(r.photo?'<figure class="ph"><div class="ph-img">'+photoImg(r.photo)+'</div></figure>':'')
+    +'<div class="rv-act" data-rep-box="'+i+'"><button class="linkbtn" type="button" data-rep="'+i+'">Laporkan ulasan</button></div></div>';
+  }).join('');
+}
+function galleryHtml(s){
+  var ph=allReviews(s).filter(function(r){return r.photo;});
+  if(!ph.length)return '<div class="empty">Belum ada testimoni foto. Foto barang atau serah terima dari transaksi asli akan tampil di sini.</div>';
+  return '<div class="ph-grid">'+ph.map(function(r){return '<figure class="ph"><div class="ph-img">'+photoImg(r.photo)+'</div><figcaption>Dari '+esc(r.who)+' · '+fmtDate(r.date)+(r.pending?' · menunggu verifikasi':'')+'</figcaption></figure>';}).join('')+'</div>';
+}
+function formHtml(s){
+  var a=me();
+  if(!a)return '<div class="gate"><p><b>Masuk dulu untuk memberi ulasan.</b> Ulasan hanya bisa dikirim dari akun, supaya penilaian datang dari orang yang punya reputasi sendiri.</p><div class="gate-act"><a class="btn primary" href="#masuk" data-next>Masuk</a><a class="btn" href="#daftar" data-next>Daftar</a></div></div>';
+  if(a.id&&a.id===s.id)return '<div class="gate"><p>Ini kartu reputasi Anda sendiri. Ulasan hanya bisa diberikan oleh pihak lawan transaksi.</p></div>';
+  var rs='';for(var i=1;i<=5;i++){rs+='<button type="button" class="rs" role="radio" aria-checked="false" aria-label="'+i+' bintang" data-v="'+i+'">★</button>';}
+  return '<form id="rf" novalidate><p class="hint" style="margin-bottom:14px">Mengulas sebagai <b>'+esc(a.handle)+'</b> ('+(a.role==='penjual'?'akun penjual':'akun pembeli')+').</p><div class="form-grid">'
+  +'<div class="field"><label for="f-role">Peran '+esc(s.handle)+' di transaksi ini</label><select id="f-role"><option value="penjual">Penjual (saya pembeli)</option>'+(a.role==='penjual'?'<option value="pembeli">Pembeli (saya penjual)</option>':'')+'</select>'+(a.role==='penjual'?'':'<span class="hint">Akun pembeli menilai penjual.</span>')+'</div>'
+  +'<div class="field"><label for="f-type">Jenis transaksi</label><select id="f-type"><option>COD</option><option>Lelang</option></select></div>'
+  +'<div class="field"><label for="f-item">Barang</label><input type="text" id="f-item" placeholder="Contoh: Nissan Silvia S15" maxlength="80" autocomplete="off"></div>'
+  +'<div class="field"><label for="f-out">Hasil transaksi</label><select id="f-out"><option value="selesai">Selesai</option><option value="batal">Dibatalkan sepihak oleh lawan transaksi</option></select></div>'
+  +'<div class="field full"><span id="f-rl" style="font-weight:600;font-size:.92rem">Rating</span><div class="rate-in" role="radiogroup" aria-labelledby="f-rl" id="f-rate">'+rs+'</div></div>'
+  +'<div class="field full"><label for="f-text">Ulasan</label><textarea id="f-text" maxlength="500" placeholder="Ceritakan pengalaman transaksi: kesesuaian barang, ketepatan waktu, komunikasi."></textarea></div>'
+  +'<div class="field full"><label for="f-photo">Foto barang atau serah terima (opsional, maksimal 3)</label><input type="file" id="f-photo" accept="image/*" multiple><div class="previews" id="f-prev"></div></div>'
+  +'<label class="consent full"><input type="checkbox" id="f-consent"> <span>Saya setuju foto ini ditampilkan di profil penjual dan saya bisa meminta penghapusannya kapan saja. Wajib dicentang bila ada foto.</span></label>'
+  +'<label class="consent full"><input type="checkbox" id="f-real"> <span>Transaksi ini benar-benar terjadi dan sudah selesai.</span></label>'
+  +'<div class="full"><p class="err" id="f-err" role="alert"></p><button class="btn primary" type="submit">Kirim ulasan</button></div></div></form>';
+}
+function detail(s){
+  st.form={rating:0,photos:[]};
+  var pend=extra[s.id].reviews.length;
+  var cntP=allReviews(s).filter(function(r){return r.from==='pembeli';}).length;
+  var cntB=allReviews(s).filter(function(r){return r.from==='penjual';}).length;
+  document.getElementById('view').innerHTML=
+  '<div class="wrap"><a class="crumb" href="#cari">← Semua penjual</a><div class="detail">'
+  +'<aside>'+kartu(s,{actions:'<button class="btn primary sm" type="button" data-act="goform">Beri ulasan</button><label class="check"><input type="checkbox" data-cmp="'+esc(s.id)+'"'+(st.cmp.indexOf(s.id)>-1?' checked':'')+'> Bandingkan</label>'})
+  +'<p class="hint" style="margin-top:10px">Ilustrasi konsep, bukan data nyata.</p>'
+  +'<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap"><span class="chip">'+esc(s.platform)+'</span><span class="chip">'+esc(s.city)+'</span>'+(s.verified?'<span class="chip good ok">Akun terverifikasi</span>':'<span class="chip">Akun belum diverifikasi</span>')+'</div></aside>'
+  +'<div class="stack">'
+  +'<section class="panel"><h2>Cek sebelum sepakat</h2><p class="hint">Daftar fakta dari data profil, bukan skor. Keputusan tetap di tangan Anda. Ambang dasar daftar ini hanya panduan awal prototipe.</p>'+checklist(s)
+  +'<p class="hint" style="margin-top:12px">Sumber: '+esc(s.group)+'. Tips: minta foto barang terbaru dan sepakati lokasi COD di tempat umum yang ramai.</p></section>'
+  +'<section class="panel"><h2>Riwayat transaksi</h2><p class="hint">Menampilkan transaksi terbaru dari '+(s.done+s.cancel)+' kesepakatan tercatat'+(pend?'. Ulasan yang baru Anda kirim berstatus menunggu verifikasi dan belum dihitung di angka kartu':'')+'.</p>'+txHtml(s)+'</section>'
+  +'<section class="panel"><h2>Testimoni foto</h2><p class="hint">Foto barang atau serah terima dari transaksi asli, bukan tangkapan layar berisi pujian.</p>'+galleryHtml(s)+'</section>'
+  +'<section class="panel" id="ulasan"><h2>Ulasan dua arah</h2><p class="hint">Pembeli menilai penjual, penjual menilai pembeli. Dua pihak sama-sama punya reputasi yang dipertaruhkan.</p>'
+  +'<div class="tabs" role="tablist"><button class="tab" role="tab" data-tab="penjual" aria-selected="'+(st.tab==='penjual')+'">Sebagai penjual ('+cntP+')</button><button class="tab" role="tab" data-tab="pembeli" aria-selected="'+(st.tab==='pembeli')+'">Sebagai pembeli ('+cntB+')</button></div>'
+  +'<div id="rvlist" role="tabpanel">'+reviewsHtml(s)+'</div></section>'
+  +'<section class="panel" id="formsec"><h2>Beri ulasan</h2><p class="hint">Isi setelah transaksi selesai. Ulasan baru diperiksa moderator sebelum dihitung ke kartu.</p>'+formHtml(s)+'</section>'
+  +'</div></div></div><div class="pad-bar"></div>';
+}
+
+/* ---------- bandingkan ---------- */
+function compare(){
+  var v=document.getElementById('view');
+  var sel=st.cmp.map(byId).filter(Boolean);
+  var h='<div class="wrap"><div class="band"><div class="sec-head"><div><h2>Bandingkan penjual</h2><p>Pilih sampai tiga penjual untuk melihat angka mereka berdampingan, sebelum memilih satu untuk bertransaksi.</p></div><a class="btn" href="#cari">Pilih penjual lain</a></div>';
+  if(sel.length<2){
+    h+='<div class="empty">Pilih minimal dua penjual lewat kotak “Bandingkan” di halaman daftar atau kartu penjual.'+(sel.length?' Sekarang baru '+sel.length+' dipilih.':'')+'</div>';
+  }else{
+    var rows=[['Rating penjual',function(s){return '<b class="tnum">'+num(s.rs)+'</b>';}],['Transaksi selesai',function(s){return '<b class="tnum">'+s.done+'</b>';}],['Batal sepihak',function(s){return '<b class="tnum">'+s.cancel+'</b>';}],['Persentase batal sepihak',function(s){return '<b class="tnum">'+fmtPct(cancelPct(s))+'</b>';}],['Rating sebagai pembeli',function(s){return '<b class="tnum">'+num(s.rb)+'</b>';}],['Transaksi dengan foto bukti',function(s){return '<b class="tnum">'+fmtPct(s.proofPct)+'</b>';}],['Jumlah ulasan',function(s){return '<b class="tnum">'+s.reviewCount+'</b>';}],['Anggota sejak',function(s){return '<b class="tnum">'+s.since+'</b>';}],['Akun terverifikasi',function(s){return s.verified?'<span class="chip good ok">Ya</span>':'<span class="chip">Belum</span>';}],['Platform',function(s){return esc(s.platform)+', '+esc(s.city);}]];
+    h+='<div class="tbl-wrap"><table class="cmp"><thead><tr><th scope="col"><span class="sr" style="position:absolute;left:-9999px">Kriteria</span></th>'+sel.map(function(s){return '<th scope="col"><a href="#penjual-'+esc(s.id)+'" style="font:800 1.05rem var(--display);text-decoration:none">'+esc(s.handle)+'</a></th>';}).join('')+'</tr></thead><tbody>'
+    +rows.map(function(r){return '<tr><th scope="row">'+r[0]+'</th>'+sel.map(function(s){return '<td>'+r[1](s)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div><p class="hint" style="margin-top:12px">Data contoh untuk prototipe. Angka ditampilkan apa adanya, tanpa peringkat atau skor gabungan.</p>';
+  }
+  v.innerHTML=h+'</div></div><div class="pad-bar"></div>';
+}
+
+/* ---------- cara kerja ---------- */
+function how(){
+  document.getElementById('view').innerHTML=
+  '<section class="band"><div class="wrap"><span class="eyebrow">Cara kerja</span><h1 style="margin-block:12px 14px;font-size:clamp(1.9rem,4.4vw,2.8rem)">Satu kartu, tiga bukti kepercayaan</h1><p class="muted" style="max-width:42rem">Masalah utama komunitas bukan lagi kekurangan informasi, tetapi kepercayaan pada orang di seberang transaksi: info yang dimanipulasi, penjual yang menghilang, atau takut ditipu. Kartu ini memperlihatkan rekam jejak penjual sebelum transaksi disepakati.</p></div></section>'
+  +'<section class="band alt"><div class="wrap"><div class="sec-head"><h2>Tiga bukti dalam satu kartu</h2></div><div class="cols">'
+  +'<div class="panel"><span class="eyebrow">1 · Riwayat transaksi</span><h3 style="margin-block:10px 8px">Jumlah selesai dan batal sepihak</h3><p>Ditampilkan apa adanya, tanpa dihaluskan.</p><p class="hint" style="margin-top:10px">Menjawab: ghosting setelah sepakat COD atau lelang.</p></div>'
+  +'<div class="panel"><span class="eyebrow">2 · Rating dua arah</span><h3 style="margin-block:10px 8px">Pembeli dan penjual saling menilai</h3><p>Dua pihak sama-sama punya reputasi yang dipertaruhkan.</p><p class="hint" style="margin-top:10px">Menjawab: komitmen yang terasa lebih mengikat.</p></div>'
+  +'<div class="panel"><span class="eyebrow">3 · Testimoni foto</span><h3 style="margin-block:10px 8px">Foto barang atau serah terima</h3><p>Berasal dari transaksi asli, bukan sekadar tangkapan layar berisi pujian.</p><p class="hint" style="margin-top:10px">Menjawab: rasa waswas pembeli baru.</p></div>'
+  +'</div></div></section>'
+  +'<section class="band"><div class="wrap"><div class="sec-head"><h2>Alur pengguna</h2></div>'+stepsHtml()+'</div></section>'
+  +'<section class="band alt"><div class="wrap"><div class="sec-head"><div><h2>Yang masuk dan belum masuk MVP</h2><p>MVP adalah versi paling kecil yang cukup untuk menguji asumsi paling berisiko, bukan produk jadi.</p></div></div><div class="two">'
+  +'<div class="panel"><h3 style="margin-bottom:10px">Masuk MVP</h3><ul class="list"><li><b>Profil penjual.</b> Nama akun, platform asal, lama aktif.</li><li><b>Riwayat transaksi.</b> Selesai vs dibatalkan sepihak.</li><li><b>Rating dua arah.</b> Diisi setelah transaksi selesai.</li><li><b>Testimoni foto.</b> Bukti barang atau serah terima.</li><li><b>Tampilan satu kartu.</b> Ringkas, terbaca sebelum sepakat.</li></ul></div>'
+  +'<div class="panel"><h3 style="margin-bottom:10px">Belum masuk</h3><ul class="list"><li><b>Rekber / escrow.</b> Butuh pihak ketiga dan urusan pembayaran.</li><li><b>Katalog dan wiki model.</b> Itu masalah lain (HMW informasi).</li><li><b>Pelacak harga, cek fakta.</b> Butuh data dan moderator tetap.</li><li><b>Forum dan event.</b> Perlu massa pengguna dulu.</li><li><b>Verifikasi otomatis, sengketa.</b> Terlalu kompleks, awalnya manual.</li></ul></div></div></div></section>'
+  +'<section class="band"><div class="wrap"><div class="sec-head"><div><h2>Keamanan dan privasi</h2><p>Fitur dasar yang harus terpenuhi sebelum peluncuran.</p></div></div><div class="two">'
+  +'<div class="panel"><h3 style="margin-bottom:10px">Fitur dasar</h3><ul class="list"><li>Profil dan pencarian berfungsi.</li><li>Label transaksi terverifikasi jelas.</li><li>Pelaporan ulasan dan moderasi.</li><li>Keamanan akun dan kontrol akses.</li><li>Kebijakan privasi dan penghapusan data.</li></ul></div>'
+  +'<div class="panel"><h3 style="margin-bottom:10px">Regulasi dan risiko</h3><ul class="list"><li>Tinjau kewajiban perlindungan data pribadi.</li><li>Periksa ketentuan penyelenggara sistem elektronik yang relevan.</li><li>Minta persetujuan penggunaan foto atau bukti.</li></ul><div class="callout" style="margin-top:14px"><b>Belum dapat diklaim selesai.</b> Masih perlu meninjau kewajiban UU Perlindungan Data Pribadi dan ketentuan PSE yang berlaku.</div></div></div></div></section>'
+  +'<section class="band alt"><div class="wrap"><div class="callout"><b>Tentang prototipe ini.</b> Semua penjual, transaksi, dan ulasan di situs ini adalah data contoh. Hipotesis yang diuji: kalau calon pembeli bisa melihat rekam jejak penjual sebelum sepakat, mereka lebih berani bertransaksi dan lebih jarang kena ghosting atau penipuan.</div></div></section><div class="pad-bar"></div>';
+}
+
+/* ---------- masuk, daftar, akun ---------- */
+function renderAuth(){
+  var a=me(),el=document.getElementById('auth');
+  el.innerHTML=a?'<a class="me" href="#akun"'+(location.hash==='#akun'?' aria-current="page"':'')+'><span class="avatar" aria-hidden="true">'+initials(a.handle)+'</span><span class="nm">'+esc(a.handle)+'</span><span class="rl">'+(a.role==='penjual'?'Penjual':'Pembeli')+'</span></a><button type="button" class="btn sm ghost" id="logout">Keluar</button>'
+  :'<a class="btn sm ghost" href="#masuk" data-next>Masuk</a><a class="btn sm primary" href="#daftar" data-next>Daftar</a>';
+}
+function sideHtml(){return '<aside class="auth-side"><span class="eyebrow">Dua peran, satu reputasi</span><h2>Pembeli dan penjual saling menilai.</h2><ul class="list"><li><b>Pembeli</b> mencari dan membandingkan penjual, lalu mengulas setelah transaksi selesai.</li><li><b>Penjual</b> punya kartu reputasi sendiri untuk ditunjukkan ke calon pembeli, dan bisa menilai pembeli.</li><li>Ulasan hanya bisa dikirim dari akun yang sudah masuk, tidak ada ulasan anonim.</li></ul></aside>';}
+function loginView(){
+  document.getElementById('view').innerHTML='<div class="wrap"><div class="auth-grid"><section class="auth-card"><span class="eyebrow">Masuk</span><h1>Selamat datang kembali.</h1><p class="muted">Masuk untuk memberi ulasan atau mengelola kartu reputasi Anda.</p>'
+  +'<form id="lf" novalidate><div class="field"><label for="l-id">Email atau nama akun</label><input type="text" id="l-id" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nama@email.com atau @nama_akun"></div>'
+  +'<div class="field"><label for="l-pw">Kata sandi</label><input type="password" id="l-pw" autocomplete="current-password"></div>'
+  +'<label class="check"><input type="checkbox" id="l-rem"> Tetap masuk di perangkat ini</label>'
+  +'<p class="err" id="l-err" role="alert"></p><button class="btn primary" type="submit" id="l-go">Masuk</button></form>'
+  +'<p class="hint" style="margin-top:16px">Belum punya akun? <a href="#daftar">Daftar sebagai pembeli atau penjual</a>.</p></section>'+sideHtml()+'</div></div><div class="pad-bar"></div>';
+}
+function registerView(){
+  var r=st.regRole,R=[['pembeli','Pembeli','Mencari dan membandingkan penjual, lalu memberi ulasan.'],['penjual','Penjual','Punya kartu reputasi sendiri dan bisa menilai pembeli.']];
+  var plats=['Instagram','Facebook','WhatsApp','TikTok'].map(function(p){return '<option>'+p+'</option>';}).join('');
+  document.getElementById('view').innerHTML='<div class="wrap"><div class="auth-grid"><section class="auth-card"><span class="eyebrow">Daftar</span><h1>Buat akun komunitas.</h1><p class="muted">Pilih peran Anda. Satu akun untuk satu peran.</p>'
+  +'<form id="rgf" novalidate><fieldset class="roles-set"><legend>Saya mendaftar sebagai</legend><div class="roles">'
+  +R.map(function(x){return '<label class="rolecard'+(r===x[0]?' on':'')+'"><input type="radio" name="role" value="'+x[0]+'"'+(r===x[0]?' checked':'')+'><b>'+x[1]+'</b><span class="hint">'+x[2]+'</span></label>';}).join('')+'</div></fieldset>'
+  +'<div class="field"><label for="r-handle">Nama akun</label><input type="text" id="r-handle" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="25" placeholder="@nama_akun"><span class="hint">3 sampai 24 karakter: huruf, angka, titik, atau garis bawah. Ini nama yang dilihat orang lain.</span></div>'
+  +'<div class="field"><label for="r-email">Email</label><input type="email" id="r-email" autocomplete="email" placeholder="nama@email.com"></div>'
+  +'<div class="form-grid"><div class="field"><label for="r-pw">Kata sandi</label><input type="password" id="r-pw" autocomplete="new-password"><span class="hint">Minimal 8 karakter.</span></div><div class="field"><label for="r-pw2">Ulangi kata sandi</label><input type="password" id="r-pw2" autocomplete="new-password"></div></div>'
+  +'<div id="seller-fields" class="form-grid"'+(r==='penjual'?'':' hidden')+'><div class="field"><label for="r-plat">Platform jualan</label><select id="r-plat">'+plats+'</select></div><div class="field"><label for="r-city">Kota</label><input type="text" id="r-city" maxlength="40" placeholder="Contoh: Surabaya"></div><div class="field full"><label for="r-group">Grup atau akun tempat berjualan (opsional)</label><input type="text" id="r-group" maxlength="80" placeholder="Contoh: Grup Facebook kolektor Surabaya"><span class="hint">Akun penjual baru mulai dari nol dan belum terverifikasi.</span></div></div>'
+  +'<label class="consent"><input type="checkbox" id="r-terms"> <span>Saya setuju data akun ini dipakai untuk menampilkan profil dan ulasan saya, dan saya bisa meminta penghapusannya kapan saja.</span></label>'
+  +'<p class="err" id="r-err" role="alert"></p><button class="btn primary" type="submit" id="r-go">Buat akun</button></form>'
+  +'<p class="hint" style="margin-top:16px">Sudah punya akun? <a href="#masuk">Masuk</a>.</p></section>'+sideHtml()+'</div></div><div class="pad-bar"></div>';
+}
+function accountView(){
+  var a=me(),isS=a.role==='penjual',s=isS?byId(a.id):null;
+  var side=s?kartu(s,{actions:'<a class="btn primary sm" href="#penjual-'+esc(s.id)+'">Buka halaman kartu</a>'})
+    :'<div class="kartu"><div class="k-head"><div class="avatar" aria-hidden="true">'+initials(a.handle)+'</div><div><div class="k-handle">'+esc(a.handle)+'</div><div class="k-sub">Akun pembeli</div></div></div><p class="hint" style="margin-top:14px">Pembeli tidak punya kartu publik. Ulasan Anda tampil di kartu penjual yang Anda nilai.</p><div class="k-foot"><a class="btn primary sm" href="#cari">Cari penjual</a></div></div>';
+  var rows=[['Nama akun',a.handle],['Email',a.email],['Peran',isS?'Penjual':'Pembeli']];
+  if(isS){rows.push(['Platform',a.platform||'-'],['Kota',a.city||'-']);}
+  rows.push(['Terdaftar',fmtDate(a.created)]);
+  document.getElementById('view').innerHTML='<div class="wrap"><div class="detail" style="padding-top:28px"><aside>'+side+'</aside><div class="stack">'
+  +'<section class="panel"><h2>Akun saya</h2><dl class="dl" style="margin-top:14px">'+rows.map(function(r){return '<dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd>';}).join('')+'</dl></section>'
+  +(isS?'<div class="callout"><b>Kartu Anda mulai dari nol.</b> Rating dan transaksi muncul setelah ada ulasan yang lolos verifikasi moderator. Tautan akun Anda belum dicocokkan (simulasi).</div>':'')
+  +'<div><button class="btn" type="button" id="logout2">Keluar</button></div></div></div></div><div class="pad-bar"></div>';
+}
+function finishLogin(a,rem,fresh){
+  setSession(a,rem);busy=false;
+  toast(fresh?'Akun dibuat. Selamat datang, '+a.handle+'.':'Berhasil masuk sebagai '+a.handle+'.');
+  var nx=st.next;st.next='';location.hash=nx||(fresh&&a.role==='penjual'?'#akun':'#cari');
+}
+function submitLogin(){
+  if(busy)return;
+  var g=function(id){return document.getElementById(id);},err=g('l-err');
+  var id=g('l-id').value.trim().toLowerCase().replace(/^@/,''),pw=g('l-pw').value,a=null;
+  err.textContent='';
+  if(!id||!pw){err.textContent='Isi email atau nama akun dan kata sandi.';return;}
+  for(var i=0;i<accounts.length;i++){if(accounts[i].email===id||accounts[i].handle==='@'+id){a=accounts[i];break;}}
+  busy=true;g('l-go').disabled=true;
+  var bad=function(){busy=false;g('l-go').disabled=false;g('l-pw').value='';err.textContent='Email atau nama akun, atau kata sandi, salah.';g('l-pw').focus();};
+  hashPw(pw,a?a.salt:'-').then(function(h){if(a&&h===a.hash)finishLogin(a,g('l-rem').checked,false);else bad();}).catch(bad);
+}
+function submitRegister(){
+  if(busy)return;
+  var g=function(id){return document.getElementById(id);},err=g('r-err');
+  var fail=function(m,id){err.textContent=m;if(id)g(id).focus();};
+  err.textContent='';
+  var role=(document.querySelector('input[name=role]:checked')||{}).value||'pembeli';
+  var handle=g('r-handle').value.trim().replace(/^@/,'').toLowerCase(),email=g('r-email').value.trim().toLowerCase(),pw=g('r-pw').value;
+  if(!/^[a-z0-9._]{3,24}$/.test(handle))return fail('Nama akun 3 sampai 24 karakter: huruf, angka, titik, atau garis bawah.','r-handle');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return fail('Isi alamat email yang valid.','r-email');
+  if(pw.length<8)return fail('Kata sandi minimal 8 karakter.','r-pw');
+  if(pw!==g('r-pw2').value)return fail('Konfirmasi kata sandi tidak sama.','r-pw2');
+  var a={email:email,handle:'@'+handle,role:role,created:new Date().toISOString().slice(0,10),since:new Date().getFullYear()};
+  if(role==='penjual'){a.platform=g('r-plat').value;a.city=g('r-city').value.trim();a.group=g('r-group').value.trim();if(!a.city)return fail('Isi kota tempat Anda berjualan.','r-city');a.id=handle;}
+  if(!g('r-terms').checked)return fail('Centang persetujuan untuk melanjutkan.');
+  if(accounts.some(function(x){return x.email===email;}))return fail('Email ini sudah terdaftar. Coba masuk.','r-email');
+  if(handleTaken(a.handle))return fail('Nama akun ini sudah dipakai. Pilih nama lain.','r-handle');
+  busy=true;g('r-go').disabled=true;a.salt=rand(16);
+  hashPw(pw,a.salt).then(function(h){
+    a.hash=h;accounts.push(a);persist();
+    if(role==='penjual'){sellers.push(sellerFromAccount(a));extra[a.id]={reviews:[],tx:[]};}
+    finishLogin(a,false,true);
+  }).catch(function(){busy=false;g('r-go').disabled=false;fail('Pendaftaran gagal diproses. Coba lagi.');});
+}
+
+/* ---------- routing ---------- */
+function route(){
+  var h=location.hash.replace('#','');
+  if(h!=='masuk'&&h!=='daftar')st.next='';
+  if((h==='masuk'||h==='daftar')&&me()){location.replace('#cari');return;}
+  if(h==='akun'&&!me()){st.next='#akun';location.replace('#masuk');return;}
+  renderAuth();
+  if(h.indexOf('penjual-')===0){var s=byId(h.slice(8));if(s){detail(s);}else{home();}}
+  else if(h==='masuk')loginView();
+  else if(h==='daftar')registerView();
+  else if(h==='akun')accountView();
+  else if(h==='bandingkan')compare();
+  else if(h==='cara-kerja')how();
+  else home();
+  var cur=h==='bandingkan'?'bandingkan':(h==='cara-kerja'?'cara-kerja':((h==='masuk'||h==='daftar'||h==='akun')?'':'cari'));
+  document.querySelectorAll('[data-nav]').forEach(function(a){if(a.getAttribute('data-nav')===cur)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  window.scrollTo(0,0);
+  updateBar();
+}
+function updateBar(){
+  var b=document.getElementById('cbar'),n=st.cmp.length;
+  b.hidden=n===0||location.hash==='#bandingkan';
+  document.getElementById('cbar-n').textContent=n+' penjual dipilih'+(n<2?' (pilih minimal 2)':'');
+  document.getElementById('cbar-go').style.opacity=n<2?'.5':'1';
+  document.getElementById('cbar-go').setAttribute('aria-disabled',n<2?'true':'false');
+}
+function curSeller(){var h=location.hash.replace('#','');return h.indexOf('penjual-')===0?byId(h.slice(8)):null;}
+
+/* ---------- event ---------- */
+document.addEventListener('input',function(e){
+  if(e.target.id==='q'){st.q=e.target.value;renderList();}
+});
+document.addEventListener('submit',function(e){
+  if(e.target.id==='sform'){e.preventDefault();var l=document.getElementById('daftar');if(l)l.scrollIntoView();}
+  if(e.target.id==='rf'){e.preventDefault();submitReview();}
+  if(e.target.id==='lf'){e.preventDefault();submitLogin();}
+  if(e.target.id==='rgf'){e.preventDefault();submitRegister();}
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.id==='ver'){st.ver=t.checked;renderList();}
+  else if(t.id==='sort'){st.sort=t.value;renderList();}
+  else if(t.hasAttribute&&t.hasAttribute('data-cmp')){
+    var id=t.getAttribute('data-cmp'),i=st.cmp.indexOf(id);
+    if(t.checked){if(st.cmp.length>=3){t.checked=false;toast('Maksimal 3 penjual untuk dibandingkan.');return;}if(i<0)st.cmp.push(id);}
+    else if(i>-1)st.cmp.splice(i,1);
+    document.querySelectorAll('[data-cmp="'+id+'"]').forEach(function(c){c.checked=t.checked;});
+    updateBar();
+  }
+  else if(t.id==='f-photo'){addPhotos(t);}
+  else if(t.name==='role'){
+    st.regRole=t.value;
+    document.querySelectorAll('.rolecard').forEach(function(c){c.classList.toggle('on',c.querySelector('input').checked);});
+    document.getElementById('seller-fields').hidden=t.value!=='penjual';
+  }
+});
+document.addEventListener('click',function(e){
+  var t=e.target.closest('button,a');if(!t)return;
+  if(t.id==='logout'||t.id==='logout2'){logout();return;}
+  if(t.hasAttribute('data-next')){var c=location.hash;if(c!=='#masuk'&&c!=='#daftar'&&c!=='#akun')st.next=c;return;}
+  if(t.hasAttribute('data-plat')){st.plat=t.getAttribute('data-plat');document.querySelectorAll('[data-plat]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-plat')===st.plat);});renderList();return;}
+  if(t.id==='cbar-clear'){st.cmp=[];document.querySelectorAll('[data-cmp]').forEach(function(c){c.checked=false;});updateBar();if(location.hash==='#bandingkan')compare();return;}
+  if(t.id==='cbar-go'&&st.cmp.length<2){e.preventDefault();toast('Pilih minimal 2 penjual untuk dibandingkan.');return;}
+  if(t.getAttribute('data-act')==='goform'){document.getElementById('formsec').scrollIntoView();return;}
+  if(t.hasAttribute('data-tab')){st.tab=t.getAttribute('data-tab');var s=curSeller();if(s){document.querySelectorAll('[data-tab]').forEach(function(b){b.setAttribute('aria-selected',b.getAttribute('data-tab')===st.tab);});document.getElementById('rvlist').innerHTML=reviewsHtml(s);}return;}
+  if(t.hasAttribute('data-rep')){
+    var box=t.parentNode;
+    box.innerHTML='<div class="rep"><label for="rep-'+t.getAttribute('data-rep')+'" class="muted">Alasan</label><select id="rep-'+t.getAttribute('data-rep')+'"><option>Ulasan palsu atau dibuat pihak terkait</option><option>Foto bukan dari transaksi ini</option><option>Berisi data pribadi</option><option>Kata kasar atau ujaran kebencian</option></select><button class="btn sm" type="button" data-rep-send="1">Kirim laporan</button></div>';
+    return;
+  }
+  if(t.hasAttribute('data-rep-send')){t.closest('.rv-act').innerHTML='<span class="chip good ok">Laporan diterima</span><span class="hint">Moderator akan meninjau ulasan ini (simulasi).</span>';toast('Laporan dikirim ke moderator (simulasi).');return;}
+  if(t.classList.contains('rs')){setRating(parseInt(t.getAttribute('data-v'),10));return;}
+  if(t.hasAttribute('data-rm')){st.form.photos.splice(parseInt(t.getAttribute('data-rm'),10),1);renderPrev();return;}
+});
+document.addEventListener('keydown',function(e){
+  if(e.target.classList&&e.target.classList.contains('rs')&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){
+    e.preventDefault();var v=parseInt(e.target.getAttribute('data-v'),10)+(e.key==='ArrowRight'?1:-1);v=Math.max(1,Math.min(5,v));setRating(v);
+    var b=document.querySelector('.rs[data-v="'+v+'"]');if(b)b.focus();
+  }
+});
+function setRating(v){
+  st.form.rating=v;
+  document.querySelectorAll('.rs').forEach(function(b){var n=parseInt(b.getAttribute('data-v'),10);b.classList.toggle('on',n<=v);b.setAttribute('aria-checked',n===v?'true':'false');});
+}
+function renderPrev(){
+  var p=document.getElementById('f-prev');if(!p)return;
+  p.innerHTML=st.form.photos.map(function(ph,i){return '<div class="pv"><div class="ph-img"><img src="'+ph+'" alt="Pratinjau foto '+(i+1)+'"></div><button type="button" data-rm="'+i+'" aria-label="Hapus foto '+(i+1)+'">×</button></div>';}).join('');
+}
+function addPhotos(inp){
+  var files=Array.prototype.slice.call(inp.files||[]),err=document.getElementById('f-err');
+  err.textContent='';
+  files.forEach(function(f){
+    if(st.form.photos.length>=3){err.textContent='Maksimal 3 foto.';return;}
+    if(f.size>5*1024*1024){err.textContent='Ukuran foto maksimal 5 MB.';return;}
+    var fr=new FileReader();
+    fr.onload=function(){if(st.form.photos.length<3){st.form.photos.push(fr.result);renderPrev();}};
+    fr.readAsDataURL(f);
+  });
+  inp.value='';
+}
+function submitReview(){
+  var s=curSeller();if(!s)return;
+  var acct=me();if(!acct){toast('Masuk dulu untuk memberi ulasan.');return;}
+  if(acct.id&&acct.id===s.id)return;
+  var g=function(id){return document.getElementById(id);},err=g('f-err');
+  var item=g('f-item').value.trim(),text=g('f-text').value.trim();
+  if(!item){err.textContent='Isi nama barang yang ditransaksikan.';g('f-item').focus();return;}
+  if(!st.form.rating){err.textContent='Pilih rating dari 1 sampai 5 bintang.';return;}
+  if(text.length<10){err.textContent='Tulis ulasan minimal 10 karakter.';g('f-text').focus();return;}
+  if(st.form.photos.length&&!g('f-consent').checked){err.textContent='Centang persetujuan penggunaan foto, atau hapus fotonya.';return;}
+  if(!g('f-real').checked){err.textContent='Konfirmasi bahwa transaksi benar-benar terjadi dan sudah selesai.';return;}
+  var role=acct.role==='pembeli'?'penjual':g('f-role').value,from=role==='penjual'?'pembeli':'penjual',today=new Date().toISOString().slice(0,10);
+  var photo=st.form.photos.length?{src:st.form.photos[0]}:null;
+  extra[s.id].reviews.unshift({from:from,who:acct.handle,rating:st.form.rating,date:today,text:text,photo:photo,pending:true});
+  extra[s.id].tx.unshift({item:item,date:today,type:g('f-type').value,status:g('f-out').value,proof:!!photo,pending:true});
+  st.tab=role;
+  detail(s);
+  document.getElementById('ulasan').scrollIntoView();
+  toast('Ulasan terkirim. Status: menunggu verifikasi moderator.');
+}
+window.addEventListener('hashchange',route);
+route();
+})();
+</script>
+
+</body></html>
